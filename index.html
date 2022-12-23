@@ -1,239 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Convert your architectural images to draw.io format!">
-    <title>image to draw.io converter</title>
-
+<html>
+  <head>
+    <title>Upload file to S3</title>
     <script src="https://unpkg.com/vue@1.0.28/dist/vue.js"></script>
     <script src="https://unpkg.com/axios@0.2.1/dist/axios.min.js"></script>
-
-    <!-- font icons -->
-    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
-
-    <!-- Bootstrap + Dorang main styles -->
-	<link rel="stylesheet" href="assets/css/dorang.css">
-
-</head>
-<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home" class="dark-theme">
-    
-    <!-- page navbar -->
-    <!--
-    <nav class="page-navbar" data-spy="affix" data-offset-top="10">
-        <ul class="nav-navbar container">
-            <li class="nav-item"><a href="#" class="nav-link">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Explore</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><img src="assets/imgs/placeholder.svg" alt="Download free bootstrap 4 landing page, free boootstrap 4 templates, Download free bootstrap 4.1 landing page, free boootstrap 4.1.1 templates, weber Landing page"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Journal</a></li>
-            <li class="nav-item search">
-                <a href="javascript:void(0)" class="nav-link search-toggle"><i class="ti-search"></i> Search</a>
-                <div class="search-wrapper">
-                    <form>
-                        <input type="search" class="form-control" name="" placeholder="hit enter to search">
-                    </form>
-                </div>
-            </li>
-        </ul>
-    </nav> 
-    -->
-    <div class="theme-selector">
-        <a href="javascript:void(0)" class="spinner">
-            <i class="ti-paint-bucket"></i>
-        </a>
-        <div class="body">
-            <a href="javascript:void(0)" class="light"></a>
-            <a href="javascript:void(0)" class="dark"></a>
-        </div>
-    </div>  
-
-    <!-- page header -->
-    <header class="header">
-        <div class="overlay"></div>
-        <div class="header-content" style="background-color:rgba(0, 0, 0, 0.345); border-radius: 2em">
-            <h1 class="header-title">Image to Draw.io Converter</h1>
-            <p class="header-subtitle">Re-creating architectural diagrams from scratch costs valuable time.</p>
-            <p class="header-subtitle">Our tool helps you seamlessly convert your architectural images into a format that can be uploaded into draw.io and allow you to <br/><strong style="color:rgb(104, 213, 207)">start editing immediately</strong></p>
-            <p class="header-subtitle"><strong style="color:rgb(199, 207, 209)">Simple to use. With no additional plugins or software required.</strong></p>
-        </div>
-    </header><!-- end of page header -->
-
-    <!-- modal -->
-    <div class="modalBox">
-        <div class="modalBox-body">
-            <iframe width="100%" height="450px" class="border-0" 
-            src="https://www.youtube.com/embed/tgbNyZ7vqY?controls=0"> <!-- To change video link -->
-            </iframe>
-        </div>          
+  </head>
+  <body>
+    <div id="app">
+      <h1>S3 Uploader Test</h1>
+  
+      <div v-if="!image">
+        <h2>Select an image</h2>
+        <input type="file" @change="onFileChange" accept="image/jpeg">
+      </div>
+      <div v-else>
+        <img :src="image" />
+        <button v-if="!uploadURL" @click="removeImage">Remove image</button>
+        <button v-if="!uploadURL" @click="uploadImage">Upload image</button>
+      </div>
+      <h2 v-if="uploadURL">Success! Image uploaded to bucket.</h2>
     </div>
-    <!-- end of modal -->
-
-    <!-- page container -->
-    <div class="container page-container">
-        <div class="col-md-10 col-lg-8 m-auto">
-            <h6 class="title mb-4">Select your image file to be converted and click the submit button once you are done</h6>
-            <!-- Upload file button-->
-            <div v-if="!image">
-                <input type="file" style="border: 2px solid black; background-color: rgba(255, 255, 255, 0.8); color:rgb(0, 150, 167);" name="file" @change="onFileChange" accept="image/jpeg"/> 
-            </div>
-            <div v-else>
-                <img :src="image" />
-                <button v-if="!uploadURL" @click="removeImage">Remove image</button>
-                <button v-if="!uploadURL" @click="uploadImage">Upload image</button>
-            </div>
-            <h2 v-if="uploadURL">Success! Image uploaded to bucket.</h2>
-        </div>
-            
-            
-        <br />
-        <br />
-            <!-- Feedback Survey -->
-            <a href = "https://survey.fieldsense.whs.amazon.dev/survey/49aa1d9e-cc53-4c03-90a4-0a8a2312df7b"" style="color:rgb(0, 150, 167); background-color: rgba(255, 255, 255, 0.85); padding:5px 10px; border-radius: 2em;">Please take a moment to provide us feedback!  <i class="ti-face-smile"></i></a>
-        <br />
-        <br />
-        <br />
-
-        <!--Video link to youtube --> 
-        <div class="col-md-10 col-lg-8 m-auto">
-            <h6 class="title mb-4">How to use image to draw.io converter</h6>
-            <button class="btn btn-theme-color modal-toggle" style="border: 2px solid black; padding: 12px 50px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.8); color:rgb(0, 150, 167);"><i class="ti-control-play text-danger"></i> Watch Video</button>
-        </div>
-
-    </div> <!-- end of page container -->
-
-
-    <!-- Future works: Modify to feedback for public -->
-    <!--
-    <div class="contact-section">
-        <div class="overlay"></div>
-
-        <div class="container">
-            <div class="col-md-10 col-lg-8 m-auto">
-                <h6 class="title mb-2">Contact Us</h6>
-                <p class="mb-5">Feel Free To Drop Us A Line.</p>
-                <form action="" class="form-group">
-                    <input type="text" size="50" class="form-control" placeholder="Your Name" required>
-                    <input type="email" class="form-control" placeholder="Enter Email"requried>
-                    <textarea name="comment" id="comment" rows="6"   class="form-control" placeholder="Write Something"></textarea>
-                    <input type="submit" value="Send Message" class="form-control">
-                </form>
-            </div>
-
-
-        </div>
-    </div>
-    -->
-
-    <!-- core  -->
-    <script src="assets/vendors/jquery/jquery-3.4.1.js"></script>
-    <script src="assets/vendors/bootstrap/bootstrap.bundle.js"></script>
-
-    <!-- bootstrap affix -->
-    <script src="assets/vendors/bootstrap/bootstrap.affix.js"></script>
-
-    <!-- Dorang js -->
-    <script src="assets/js/dorang.js"></script>
-
-
+  
     <script>
-        const MAX_IMAGE_SIZE = 1000000
-  
-        /* ENTER YOUR ENDPOINT HERE */
-  
-        const API_ENDPOINT = 'https://qpqdhi1er3.execute-api.us-west-2.amazonaws.com/uploads' // e.g. https://ab1234ab123.execute-api.us-east-1.amazonaws.com/uploads
-  
-        new Vue({
-          el: "#app",
-          data: {
-            image: '',
-            uploadURL: ''
+      const MAX_IMAGE_SIZE = 1000000
+​
+      /* ENTER YOUR ENDPOINT HERE */
+​
+      const API_ENDPOINT = 'https://qpqdhi1er3.execute-api.us-west-2.amazonaws.com/uploads' // e.g. https://ab1234ab123.execute-api.us-east-1.amazonaws.com/uploads
+​
+      new Vue({
+        el: "#app",
+        data: {
+          image: '',
+          uploadURL: ''
+        },
+        methods: {
+          onFileChange (e) {
+            let files = e.target.files || e.dataTransfer.files
+            if (!files.length) return
+            this.createImage(files[0])
           },
-          methods: {
-            onFileChange (e) {
-              let files = e.target.files || e.dataTransfer.files
-              if (!files.length) return
-              this.createImage(files[0])
-            },
-            createImage (file) {
-              // var image = new Image()
-              let reader = new FileReader()
-              reader.onload = (e) => {
-                console.log('length: ', e.target.result.includes('data:image/jpeg'))
-                if (!e.target.result.includes('data:image/jpeg')) {
-                  return alert('Wrong file type - JPG only.')
-                }
-                if (e.target.result.length > MAX_IMAGE_SIZE) {
-                  return alert('Image is loo large.')
-                }
-                this.image = e.target.result
+          createImage (file) {
+            // var image = new Image()
+            let reader = new FileReader()
+            reader.onload = (e) => {
+              console.log('length: ', e.target.result.includes('data:image/jpeg'))
+              if (!e.target.result.includes('data:image/jpeg')) {
+                return alert('Wrong file type - JPG only.')
               }
-              reader.readAsDataURL(file)
-            },
-            removeImage: function (e) {
-              console.log('Remove clicked')
-              this.image = ''
-            },
-            uploadImage: async function (e) {
-              console.log('Upload clicked')
-              // Get the presigned URL
-              const response = await axios({
-                method: 'GET',
-                url: API_ENDPOINT
-              })
-              console.log('Response: ', response)
-              console.log('Uploading: ', this.image)
-              let binary = atob(this.image.split(',')[1])
-              let array = []
-              for (var i = 0; i < binary.length; i++) {
-                array.push(binary.charCodeAt(i))
+              if (e.target.result.length > MAX_IMAGE_SIZE) {
+                return alert('Image is loo large.')
               }
-              let blobData = new Blob([new Uint8Array(array)], {type: 'image/jpeg'})
-              console.log('Uploading to: ', response.uploadURL)
-              const result = await fetch(response.uploadURL, {
-                method: 'PUT',
-                body: blobData
-              })
-              console.log('Result: ', result)
-              // Final URL for the user doesn't need the query string params
-              this.uploadURL = response.uploadURL.split('?')[0]
+              this.image = e.target.result
             }
+            reader.readAsDataURL(file)
+          },
+          removeImage: function (e) {
+            console.log('Remove clicked')
+            this.image = ''
+          },
+          uploadImage: async function (e) {
+            console.log('Upload clicked')
+            // Get the presigned URL
+            const response = await axios({
+              method: 'GET',
+              url: API_ENDPOINT
+            })
+            console.log('Response: ', response)
+            console.log('Uploading: ', this.image)
+            let binary = atob(this.image.split(',')[1])
+            let array = []
+            for (var i = 0; i < binary.length; i++) {
+              array.push(binary.charCodeAt(i))
+            }
+            let blobData = new Blob([new Uint8Array(array)], {type: 'image/jpeg'})
+            console.log('Uploading to: ', response.uploadURL)
+            const result = await fetch(response.uploadURL, {
+              method: 'PUT',
+              body: blobData
+            })
+            console.log('Result: ', result)
+            // Final URL for the user doesn't need the query string params
+            this.uploadURL = response.uploadURL.split('?')[0]
           }
-        })
-      </script>
-      <style type="text/css">
-        body {
-          background: #20262E;
-          padding: 20px;
-          font-family: sans-serif;
         }
-        #app {
-          background: #fff;
-          border-radius: 4px;
-          padding: 20px;
-          transition: all 0.2s;
-          text-align: center;
-        }
-        #logo {
-          width: 100px;
-        }
-        h2 {
-          font-weight: bold;
-          margin-bottom: 15px;
-        }
-        h1, h2 {
-          font-weight: normal;
-          margin-bottom: 15px;
-        }
-        a {
-          color: #42b983;
-        }
-        img {
-          width: 30%;
-          margin: auto;
-          display: block;
-          margin-bottom: 10px;
-        }
-      </style>
-
-</body>
+      })
+    </script>
+    <style type="text/css">
+      body {
+        background: #20262E;
+        padding: 20px;
+        font-family: sans-serif;
+      }
+      #app {
+        background: #fff;
+        border-radius: 4px;
+        padding: 20px;
+        transition: all 0.2s;
+        text-align: center;
+      }
+      #logo {
+        width: 100px;
+      }
+      h2 {
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+      h1, h2 {
+        font-weight: normal;
+        margin-bottom: 15px;
+      }
+      a {
+        color: #42b983;
+      }
+      img {
+        width: 30%;
+        margin: auto;
+        display: block;
+        margin-bottom: 10px;
+      }
+    </style>
+  </body>
 </html>
